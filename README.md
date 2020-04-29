@@ -47,7 +47,10 @@ In your source then:
  * int functioname()
  * but OOPSes when an error occurs.
  */
-#define O(A,B...)       static void O##A(Otwo(B)) { if (A(O2nd(B))) OOPS(#A); }
+#define C(A,B...)       A(B)
+#define O(A,B...)       static void O##A(Otwo(B)) { if (C(A,O2nd(B))) OOPS(#A "() failed"); }
+#define I(A,B...)       static void O##A(Otwo(B)) { while (C(A,O2nd(B))) { if (errno!=EINTR) OOPS(#A "() failed"); } }
+#define R(X,A,B...)     static X O##A(Otwo(B)) { X _; _=C(A,O2nd(B)); if (!_) OOPS(#A "() failed"); return _; }
 ```
 
 You can use this to create some standard wrapper routines,
@@ -61,6 +64,28 @@ O(  sigemptyset, sigset_t *,set);
 ```
 int sigaction( int signum, const struct sigaction * act, struct sigaction * oldact);
 O(  sigaction, int,signum, const struct sigaction *,act, struct sigaction *,oldact);
+```
+
+Or functions which must retry on EINTR:
+
+```
+int tcgetattr(int fd, struct termios * termios_p);
+I(  tcgetattr,int,fd, struct termios *,termios_p);
+```
+```
+int tcsetattr(int fd, int optional_actions, const struct termios * termios_p);
+I(  tcsetattr,int,fd, int,optional_actions, const struct termios *,termios_p);
+```
+
+Or prevent the NULL on error for functions returning pointers:
+
+```
+  struct tm * gmtime_r(const time_t * timep, struct tm * result);
+R(struct tm *,gmtime_r,const time_t *,timep, struct tm *,result);
+```
+```
+  void * malloc(size_t size);
+R(void *,malloc,size_t,size);
 ```
 
 For this all you have to do is to stick to the `type,name` idiom.  `typedef` is your friend.
