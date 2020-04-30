@@ -91,6 +91,12 @@ R(void *,malloc,size_t,size);
 For this all you have to do is to stick to the `type,name` idiom.  `typedef` is your friend.
 
 
+## Links
+
+- https://github.com/pfultz2/Cloak/
+- https://web.archive.org/web/20180815204201/http://saadahmad.ca/cc-preprocessor-metaprogramming-2/
+- https://gustedt.wordpress.com/2010/06/08/detect-empty-macro-arguments/
+
 ## FAQ
 
 WTF why?
