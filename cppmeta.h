@@ -66,8 +66,8 @@
 /* ]]] */
 
 #define	IF(A)		CAT(IF_,BOOL(A))
-#define	IF_1(A,B)	A
-#define	IF_0(A,B)	B
+#define	IF_1(A,B...)	A
+#define	IF_0(A,B...)	B
 
 #define	BOOL(A)		INV(NOT(A))	/* inverse of NOT	*/
 
