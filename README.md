@@ -1,11 +1,11 @@
-# CPP tricks
+# C Preprocessor metaprogramming and other useful abuses
 
 The C Preprocessor is very mighty.
 
-This here basically implements a `NOTEMPTY` macro and on top of that a `FOR` macro,
-which is able to iterate over a variable number of arguments.
+This here basically implements a `NOTEMPTY` macro and on top of that a `FORGE` macro,
+which is able to variably iterate over a variable number of arguments.
 
-> This is based on the `EVAL` feature, which is very CPU intensitive!
+> This is based on the `EVAL` idiom, which is very CPU intensitive!
 
 Note that this is based on ideas presented elsewhere.  Please see comments for details.
 
@@ -14,12 +14,12 @@ You probably need a modern C18 `GCC`, as ellipsis variables are used heavily.
 
 ## Usage
 
-	git submodule add https://github.com/hilbix/cpptricks.git
-	ln -s --relative cpptricks/cpptricks.h h/
+	git submodule add https://github.com/hilbix/cppmeta.git
+	ln -s --relative cppmeta/cppmeta.h h/
 
 In your source then:
 
-	#include "h/cpptricks.h"
+	#include "h/cppmeta.h"
 
 
 ## Example
