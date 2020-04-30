@@ -43,10 +43,10 @@
 
 /* 0 if CHECK(something) is not PROBE()
  * 1 if something expands to PROBE()
- * as long as something is normally free of any comma
+ * as long as "something" is free of any comma
  */
 #define	CHECK(A...)	SECOND(A,0,)
-#define	PROBE(A)	A,1,
+#define	PROBE()		~,1,
 
 /* Check for A starting with some paired parenteses
  * ()
@@ -55,16 +55,19 @@
 #define	PAREN(A)	CHECK(PAREN_ A)
 #define	PAREN_(...)	PROBE()
 
-/* Inverted match: gives 0 for any A which is not 0.  For A==0 it gives 1
+/* Inverted match: For A==0 it gives 1, for anything else it gives 0
  */
 #define	NOT(A)		CHECK(CONS(NOT_,A))
-#define	NOT_0		PROBE(~)
+#define	NOT_0		PROBE()
 
 #define DEFER(A)	A NOTHING()
 #define OBSTRUCT(A)	A DEFER(NOTHING)()
 
 /* ]]] */
 
+/* IF(1)(A,B,C) gives A
+ * IF(0)(A,B,C) gives B,C
+ */
 #define	IF(A)		CAT(IF_,BOOL(A))
 #define	IF_1(A,B...)	A
 #define	IF_0(A,B...)	B
@@ -75,6 +78,9 @@
 #define	INV_0		1
 #define	INV_1		0
 
+/* WHEN(1)(X,Y) gives X,Y while IF(1)(X,Y) gives X
+ * UNLESS(X)(Y) is the same as  IF(X)(,Y)
+ */
 #define	WHEN(A)		IF(A)(TAIL0,HEAD0)	/* quick IF	*/
 #define	UNLESS(A)	IF(A)(HEAD0,TAIL0)	/* quick ELSE	*/
 
