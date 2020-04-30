@@ -4,8 +4,7 @@
  * For a better understanding I kept the names near the original there.
  *
  * The rest in this file either is extremely trivial
- * or it is completely new and novel code not based on anything
- * except some days of experimentation.
+ * or it is not based on  some days of experimentation.
  */
 
 #define	EVAL(A...)	EVAL1(EVAL1(EVAL1(EVAL1(A))))
@@ -18,17 +17,29 @@
 
 #define	CAT(A...)	CONS(A)
 #define	CONS(A,B...)	A ## B
-#define	FIRST(A,...)	A
-#define	REST(A,B...)	B
+#define	HEAD(A,B...)	A
+#define	TAIL(A,B...)	B
 #define	SECOND(A,B,...)	B
 #define	THIRD(A,B,C,...)	C
-
 #define NOTHING()
-#define	EATIT(A...)
-#define	EXPAN(A...)	A
+
+/* We do not need HEAD5.  If you do, rather change the design.
+ * Humans can immediately count 0,1,2,3 but not 4.  This is especially true for grouping with the eye.
+ * Stopping at 4 allows us to immediately detect 4 as "something else than 0,1,2,3".
+ */
+#define	HEAD0(A...)
+#define	TAIL0(A...)	A
+#define	HEAD1(A,B...)	A
+#define	TAIL1(A,B...)	B
+#define	HEAD2(A,B,C...)	A,B
+#define	TAIL2(A,B,C...)	C
+#define	HEAD3(A,B,C,D...)	A,B,C
+#define	TAIL3(A,B,C,D...)	D
+#define	HEAD4(A,B,C,D,E...)	A,B,C,D
+#define	TAIL4(A,B,C,D,E...)	E
+
 
 /* [[[ */
-
 
 /* 0 if CHECK(something) is not PROBE()
  * 1 if something expands to PROBE()
@@ -64,20 +75,21 @@
 #define	INV_0		1
 #define	INV_1		0
 
-#define	WHEN(A)		IF(A)(EXPAN,EATIT)	/* quick IF	*/
-#define	UNLESS(A)	IF(A)(EATIT,EXPAN)	/* quick ELSE	*/
+#define	WHEN(A)		IF(A)(TAIL0,HEAD0)	/* quick IF	*/
+#define	UNLESS(A)	IF(A)(HEAD0,TAIL0)	/* quick ELSE	*/
 
-/* Create a FOR loop with an auxiliary FN:
+/* Create a FOR loop with an auxiliary FN: (called FORGE for now)
  *
  * WARNING, THIS IS DEAD SLOW due to the EVAL, DO NOT USE EXTENSIVELY!
  * Also a bigger argument count might not evaluate,
  * in that case exted the EVALs above (makes it even slower).
  *
- * EVAL(FOR(FN,ARGS...)) expands to:
+ * EVAL(FORGE(FN,ARGS...)) expands to:
  *
- * - Nothing, if there are no ARGS...
- * - on the 1st loop: FN_0(ARGS...) FN_1(ARGS...) FOR(FN,FN_2(ARGS))
- * - on the 2nd loop: FN_3(ARGS...) FN_1(ARGS...) FOR(FN,FN_2(ARGS))
+ * - Nothing, if ARGS... is empty, else:
+ * - on the 1st loop: FN_0(ARGS...) FN_1(ARGS...) FORGE(FN,FN_2(ARGS))
+ * - on the 2nd loop: FN_3(ARGS...) FN_1(ARGS...) FORGE(FN,FN_2(ARGS))
+ * - end of nonempty: FN_4()
  *
  * Pseudo Shell-like Code:
  *
@@ -99,15 +111,15 @@
  * #define FN_3(...)		,		// separator in between
  * #define FN_4(...)		)		// output suffix
  *
- * EVAL(FOR(FN, a1,b1, a2,b2))
+ * EVAL(FORGE(FN, a1,b1, a2,b2))
  */
-#define FOR(FN,A...)		FOR_(FN,0,A)
-#define FOR_(FN,N,A...)		IF(NOTEMPTY(A))(FOR_1,FOR_##N)(FN,N,A)()(FN,3,IF(NOTEMPTY(A))(FN##_2,EATIT)(A))
-#define FOR_0(FN,N,A...)	EATIT
-#define FOR_1(FN,N,A...)	FN##_##N(A) FN##_1(A) OBSTRUCT(FOR_2)
-#define FOR_2()			FOR_
-#define FOR_3(FN,N,A...)	FN##_4() OBSTRUCT(FOR_4)
-#define	FOR_4()			EATIT
+#define FORGE(FN,A...)		FORGE_(FN,0,A)
+#define FORGE_(FN,N,A...)	IF(NOTEMPTY(A))(FORGE_1,FORGE_##N)(FN,N,A)()(FN,3,IF(NOTEMPTY(A))(FN##_2,HEAD0)(A))
+#define FORGE_0(FN,N,A...)	HEAD0
+#define FORGE_1(FN,N,A...)	FN##_##N(A) FN##_1(A) OBSTRUCT(FORGE_2)
+#define FORGE_2()		FORGE_
+#define FORGE_3(FN,N,A...)	FN##_4() OBSTRUCT(FORGE_4)
+#define	FORGE_4()		HEAD0
 
 /* Check for nonempty arg "A..." as follows:
  *	If "A..." is "X", expand it to "0,X"

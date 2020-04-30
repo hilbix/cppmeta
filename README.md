@@ -26,7 +26,7 @@ In your source then:
 
 ```
 /* A,B,C,D,..   => A B , C D , ..       */
-#define Otwo(A...)              EVAL(FOR(Otwo,A))
+#define Otwo(A...)              EVAL(FORGE(Otwo,A))
 #define Otwo_0(A,B,C...)
 #define Otwo_1(A,B,C...)        A B
 #define Otwo_2(A,B,C...)        C
@@ -34,7 +34,7 @@ In your source then:
 #define Otwo_4()
 
 /* A,B,C,D,..   => B , D , ..   */
-#define O2nd(A...)              EVAL(FOR(O2nd,A))
+#define O2nd(A...)              EVAL(FORGE(O2nd,A))
 #define O2nd_0(A,B,C...)
 #define O2nd_1(A,B,C...)        B
 #define O2nd_2(A,B,C...)        C
